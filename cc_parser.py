@@ -5,21 +5,23 @@ import csv
 #budget filter sort and sum based on text filters
 #takes one arg, the CC csv file to be filtered 
 
-grocery_filter = 'filter_grocery.csv'
-rest_filter = 'filter_restaurants.csv'
-airtravel_filter =  'filter_air_travel.csv'
-alch_filter = 'filter_alcohol.csv'
-amazon_filter = 'filter_amazon.csv'
-bryan_filter = 'filter_bryan.csv'
-camping_filter = 'filter_camping.csv'
-costco_filter = 'filter_costco.csv'
-gas_filter = 'filter_gasoline.csv'
-hailey_filter = 'filter_hailey.csv'
-homeimprov_filter = 'filter_home_improv.csv'
-jill_filter = 'filter_jill.csv'
-localretail_filter = 'filter_local_retail.csv'
-payment_filter = 'filter_payments.csv'
-subscrip_filter = 'filter_subscriptions.csv'
+filters= [
+    'filter_grocery.csv',
+    'filter_restaurants.csv',
+    'filter_air_travel.csv',
+    'filter_alcohol.csv',
+    'filter_amazon.csv',
+    'filter_bryan.csv',
+    'filter_camping.csv',
+    'filter_costco.csv',
+    'filter_gasoline.csv',
+    'filter_hailey.csv',
+    'filter_home_improv.csv',
+    'filter_jill.csv',
+    'filter_local_retail.csv',
+    'filter_payments.csv',
+    'filter_subscriptions.csv',
+    ]
 
 desc_col = []
 date_col = []
@@ -65,8 +67,23 @@ def write_results(fname,header,data):
         fwriter.writerows(data)
         fwriter.writerow(' ') #blank line for next appened entry
 
-def main(fname):
-
+def main_test(fname):
+    #manually filter name entry test
+    grocery_filter = 'filter_grocery.csv'
+    rest_filter = 'filter_restaurants.csv'
+    airtravel_filter =  'filter_air_travel.csv'
+    alch_filter = 'filter_alcohol.csv'
+    amazon_filter = 'filter_amazon.csv'
+    bryan_filter = 'filter_bryan.csv'
+    camping_filter = 'filter_camping.csv'
+    costco_filter = 'filter_costco.csv'
+    gas_filter = 'filter_gasoline.csv'
+    hailey_filter = 'filter_hailey.csv'
+    homeimprov_filter = 'filter_home_improv.csv'
+    jill_filter = 'filter_jill.csv'
+    localretail_filter = 'filter_local_retail.csv'
+    payment_filter = 'filter_payments.csv'
+    subscrip_filter = 'filter_subscriptions.csv'
     fname = str(fname)
 
     global desc_col
@@ -110,5 +127,46 @@ def main(fname):
 
     return data
 
+def main(fname, write_flag):
+
+    fname = str(fname)
+
+    global desc_col
+    global date_col
+    data = []
+
+    print('input file: ' + str(fname))
+    with open(str(fname), 'r') as csv_file:
+        data = list(csv.reader(csv_file, delimiter=','))
+
+    header = data.pop(0)
+    for i in range(len(header)):
+        if 'Date' in header[i]:
+            dat_col = i
+            print('Date found Col: ' + str(i) + ' ' + header[i])
+        if 'Description' in header[i]:
+            desc_col = i
+            print('Descripton found Col: ' + str(i) + ' ' + header[i])
+    
+    #run one filter first on input data
+    ub_data, match = filter_parser(data,filters[0])
+    if write_flag:
+        write_results(filters[0]+'_matches.csv', header, match)
+
+    for fltr in filters[1:]:
+        ub_data, match = filter_parser(ub_data,fltr)
+        if write_flag:
+            write_results(fltr+'_matches.csv', header, match)
+
+    print("\n Unbudgeted Transactions\n")
+    for i in ub_data:
+        print(i)
+    if write_flag:
+        write_results('unmatched_resuts.csv', header, ub_data)
+
+    return data
 if __name__=='__main__':
-    main(sys.argv[1])
+
+    write_data_to_files = 1 # write out results to individual files
+    main(sys.argv[1],write_data_to_files)
+
