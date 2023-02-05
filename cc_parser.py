@@ -1,5 +1,6 @@
 import csv
 import sys
+import csv
 
 #budget filter sort and sum based on text filters
 #takes one arg, the CC csv file to be filtered 
@@ -57,6 +58,13 @@ def filter_parser(trans,fltr_file):
 
     return trans, filter_matches
 
+def write_results(fname,header,data):
+    with open(fname,'a+') as f:
+        fwriter = csv.writer(f)
+        fwriter.writerow(header)
+        fwriter.writerows(data)
+        fwriter.writerow(' ') #blank line for next appened entry
+
 def main(fname):
 
     fname = str(fname)
@@ -79,6 +87,7 @@ def main(fname):
             print('Descripton found Col: ' + str(i) + ' ' + header[i])
 
     ub_data, grocery_match = filter_parser(data,grocery_filter)
+    write_results('grocery_match.csv',header,grocery_match)
 
     ub_data, rest_match = filter_parser(ub_data,rest_filter)
     ub_data, airtravel_match = filter_parser(ub_data,airtravel_filter)
